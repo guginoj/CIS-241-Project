@@ -1,6 +1,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#define MAX_YEARS 15 // Limitting years for yearly statistics to hold
+
+
+// Structure to carry year statistics
+typedef struct {
+    int year;
+    double ratio_sum;
+    int count;
+} YearStat;
+
+// Function Prototypes
+void print_yearly_stats(YearStat stats[], int size);
+int find_year_index(YearStat stats[], int size, int year);
+
 
 int main() {
     FILE *file = fopen("SPY241Project.txt", "r");
@@ -16,6 +30,8 @@ int main() {
     double ratio, ratio_average, call_average, put_average, options_average;
     double ratio_sum = 0, call_sum = 0, put_sum = 0, options_sum = 0, max_ratio = 0, min_ratio = 2, stddev_ratio = 0, ratio_square_sum = 0;
     int put, call, options, count = 0;
+    YearStat stats[MAX_YEARS];
+    int year_count = 0;
 
     fgets(line, sizeof(line), file); // Skip header line
 
@@ -24,6 +40,10 @@ int main() {
 
         printf("Date: %s, Ratio: %.2f, Put: %d, Call: %d, Options: %d\n", date, ratio, put, call, options);
         
+        // Find the current year of the line
+        int month, day, year;
+        sscanf(date, "%d/%d/%d", &month, &day, &year);
+        year += 2000;
 
         if (ratio > max_ratio) {
             max_ratio = ratio;
@@ -38,8 +58,22 @@ int main() {
         call_sum += call;
         put_sum += put;
         options_sum += options;
-    }
 
+        // Yearly statistics calculations
+        int index = find_year_index(stats, year_count, year);
+
+        if (index == -1) {
+            if (year_count < MAX_YEARS) {
+                stats[year_count].year = year;
+                stats[year_count].ratio_sum = ratio;
+                stats[year_count].count = 1;
+                year_count++;
+            }
+        } else {
+            stats[index].ratio_sum += ratio;
+            stats[index].count++;
+        }
+    }
 
     ratio_average = ratio_sum / count;
     call_average = call_sum / count;
@@ -53,7 +87,36 @@ int main() {
            ratio_average, put_average, call_average, options_average);
     printf("Max Ratio: %.2f, Min Ratio: %.2f\n", max_ratio, min_ratio);
     printf("Standard Deviation of Ratio: %.2f\n", stddev_ratio);
+
+    // Display yearly statistics
+    print_yearly_stats(stats, year_count);
     
     fclose(file);
     return 0;
+}
+
+
+// Function to find year index
+int find_year_index(YearStat stats[], int size, int year) {
+    for (int i = 0; i < size; i++) {
+        if (stats[i].year == year)
+            return i;
+    }
+    return -1;
+}
+
+// Function to printout formatted yearly statistics
+void print_yearly_stats(YearStat stats[], int size) {
+    printf("\n===== YEARLY ANALYSIS =====\n");
+
+    for (int i = 0; i < size; i++) {
+        double avg = stats[i].ratio_sum / stats[i].count;
+
+        printf("Year %d -> Avg Ratio: %.3f | ", stats[i].year, avg);
+
+        if (avg > 1.0)
+            printf("Bearish\n");
+        else
+            printf("Bullish\n");
+    }
 }

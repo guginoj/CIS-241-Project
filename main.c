@@ -125,43 +125,43 @@ void print_yearly_stats(YearStat stats[], int size) {
 }
 
 void print_financial_advice (float pcRatio){
-    static int prevSntmnt = 1; // 0 for Bearish, 1 for neither, 2 for Bullish
+    static int prevSntmnt = 1;                                  // 0 for Bearish, 1 for neither, 2 for Bullish
 
-    if(prevSntmnt == 1 && (pcRatio > 0.6 && pcRatio < 0.8)){
+    if(prevSntmnt == 1 && (pcRatio > 0.6 && pcRatio < 0.8)){    // Previous and current sentiment neutral: hold
         printf(" Hold\n");
     }
-    else if(prevSntmnt == 1 && pcRatio < 0.6){
+    else if(prevSntmnt == 1 && pcRatio < 0.6){                  // Previous neutral, current bull: buy
         printf(" Buy\n");
     }
-    else if(prevSntmnt == 1 && pcRatio > 0.8){
+    else if(prevSntmnt == 1 && pcRatio > 0.8){                  // Previous neutral, current bear: sell
         printf(" Sell\n");
     }
-    else if(prevSntmnt == 0 && (pcRatio > 0.6 && pcRatio < 0.8)){
+    else if(prevSntmnt == 0 && (pcRatio > 0.6 && pcRatio < 0.8)){ // Previous bear, current neutral: buy
         printf(" Buy\n");
     }
-    else if(prevSntmnt == 0 && pcRatio < 0.6){
+    else if(prevSntmnt == 0 && pcRatio < 0.6){                  // Previous bear, current bull: buy
         printf(" Buy\n");
     }
-    else if(prevSntmnt == 0 && pcRatio > 0.8){
+    else if(prevSntmnt == 0 && pcRatio > 0.8){                  // Previous bear, current bear: hold
         printf(" Hold\n");
     }
-    else if(prevSntmnt == 2 && (pcRatio > 0.6 && pcRatio < 0.8)){
+    else if(prevSntmnt == 2 && (pcRatio > 0.6 && pcRatio < 0.8)){ // Previous bull, current neutral: sell
         printf(" Sell\n");
     }
-    else if(prevSntmnt == 2 && pcRatio < 0.6){
-        printf(" Hold\n");
+    else if(prevSntmnt == 2 && pcRatio < 0.6){                  // Previous bull, current bull: buy
+        printf(" Buy\n");
     }
-    else if(prevSntmnt == 2 && pcRatio > 0.8){
+    else if(prevSntmnt == 2 && pcRatio > 0.8){                  // Previous bull, current bear: sell
         printf(" Sell\n");
     }
 
-    if(pcRatio < 0.6){
+    if(pcRatio < 0.6){          // put-call ratio noticeably less than 0.7, bullish sentiment.
         prevSntmnt = 2;
     }
-    else if(pcRatio > 0.8){
+    else if(pcRatio > 0.8){     // put-call ratio noticeably more than 0.7, bullish sentiment.
         prevSntmnt = 0;
     }
     else{
-        prevSntmnt = 1;
+        prevSntmnt = 1;         // put-call ratio not noticeably different than 0.7, bullish sentiment.
     }
 }

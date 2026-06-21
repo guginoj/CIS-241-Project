@@ -18,27 +18,33 @@ int find_year_index(YearStat stats[], int size, int year);
 
 
 int main() {
-    FILE *file = fopen("SPY241Project.txt", "r");
+    FILE *file = fopen("SPY241Project.txt", "r"); // Open the file in read mode
 
-    if (file == NULL) {
+    if (file == NULL) { // Check if file opened successfully
         printf("Failed to open file\n");
         return 1;
     }
 
     char line[100];
-
     char date[20];
+
+    // Variables for ratio statistics and averages
     double ratio, ratio_average, call_average, put_average, options_average;
     double ratio_sum = 0, call_sum = 0, put_sum = 0, options_sum = 0, max_ratio = 0, min_ratio = 2, stddev_ratio = 0, ratio_square_sum = 0;
+    
     int put, call, options, count = 0;
+    
     YearStat stats[MAX_YEARS];
     int year_count = 0;
 
     fgets(line, sizeof(line), file); // Skip header line
 
     while (fgets(line, sizeof(line), file) != NULL) {
+
+        // Parse date, ratio, put volume, call volume, and total options
         sscanf(line, "%19[^,],%lf,%d,%d,%d", date, &ratio, &put, &call, &options);
 
+        // Display daily record
         printf("Date: %8s, Ratio: %.2f, Put: %-7d, Call: %-7d, Options: %-8d", date, ratio, put, call, options);
 
         print_financial_advice(ratio);
@@ -48,13 +54,14 @@ int main() {
         sscanf(date, "%d/%d/%d", &month, &day, &year);
         year += 2000;
 
+        // Track maximum and minimum put/call ratios
         if (ratio > max_ratio) {
             max_ratio = ratio;
         }
         if (ratio < min_ratio) {
             min_ratio = ratio;
         }
-
+        // Store values for averages and standard deviation
         ratio_square_sum += ratio * ratio;
         count++;
         ratio_sum += ratio;
@@ -78,11 +85,13 @@ int main() {
         }
     }
 
+    // Calculate averages
     ratio_average = ratio_sum / count;
     call_average = call_sum / count;
     put_average = put_sum / count;
     options_average = options_sum / count;
 
+    // Calculate standard deviation of put/call ratio
     stddev_ratio = sqrt((ratio_square_sum / count) - (ratio_average * ratio_average));
 
 
@@ -94,7 +103,7 @@ int main() {
     // Display yearly statistics
     print_yearly_stats(stats, year_count);
 
-    fclose(file);
+    fclose(file); // Close file
     return 0;
 }
 

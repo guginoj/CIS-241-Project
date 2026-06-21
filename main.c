@@ -4,11 +4,11 @@
 #define MAX_YEARS 15 // Limiting years for yearly statistics to hold
 
 
-// Structure to carry year statistics
+// Structure to store yearly put/call ratio statistics
 typedef struct {
-    int year;
-    double ratio_sum;
-    int count;
+    int year;            // Calendar year
+    double ratio_sum;    // Sum of all put/call ratios for the year
+    int count;           // Number of trading days recorded for the year
 } YearStat;
 
 // Function Prototypes
@@ -31,8 +31,8 @@ int main() {
     double ratio, ratio_average, call_average, put_average, options_average;
     double ratio_sum = 0, call_sum = 0, put_sum = 0, options_sum = 0, max_ratio = 0, min_ratio = 2, stddev_ratio = 0, ratio_square_sum = 0;
     int put, call, options, count = 0;
-    YearStat stats[MAX_YEARS];
-    int year_count = 0;
+    YearStat stats[MAX_YEARS]; // Array to hold yearly statistics
+    int year_count = 0; // Number of unique years stored in stats
 
     fgets(line, sizeof(line), file); // Skip header line
 
@@ -93,30 +93,44 @@ int main() {
 
     // Display yearly statistics
     print_yearly_stats(stats, year_count);
-
+    
     fclose(file);
     return 0;
 }
 
 
-// Function to find year index
+
+
+// Search the stats array for a given year.
+// Return its index if found, otherwise return -1.
 int find_year_index(YearStat stats[], int size, int year) {
+    // Loop through each element in the stats array
     for (int i = 0; i < size; i++) {
-        if (stats[i].year == year)
-            return i;
+        // Check if the current element's year matches the target year
+        if (stats[i].year == year) 
+
+            // Return the index of the matching year
+            return i; 
     }
+
+    // No matching year was found, so return -1
     return -1;
 }
 
-// Function to printout formatted yearly statistics
+// Prints the average put/call ratio and market sentiment for each year given
 void print_yearly_stats(YearStat stats[], int size) {
+    // Print a heading for the yearly analysis section
     printf("\n===== YEARLY ANALYSIS =====\n");
 
+    // Loop through each YearStat structure in the array
     for (int i = 0; i < size; i++) {
-        double avg = stats[i].ratio_sum / stats[i].count;
-
-        printf("Year %d -> Avg Ratio: %.3f | ", stats[i].year, avg);
-
+        // Calculate the average put/call ratio for the current year
+        double avg = stats[i].ratio_sum / stats[i].count; 
+        
+        // Print the year and its average ratio
+        printf("Year %d -> Avg Ratio: %.3f | ", stats[i].year, avg); 
+        
+        // Determine and print the market sentiment based on the average ratio
         if (avg > 1.0)
             printf("Bearish\n");
         else
